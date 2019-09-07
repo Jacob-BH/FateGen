@@ -268,13 +268,27 @@
 	}
 
 	if (isset($name)) { // This part runs if you've loaded a character by any means, and provides the character generation form.
-		$query = $conn->query("SELECT type FROM characters WHERE name='$name'");
-		$type = $query->fetch_array(MYSQLI_ASSOC)['type'];
-		$query->close();
+		// Load a query for each table. CHARACTERS and SKILLS will each be a single row, but ASPECTS and STUNTS will likely be more.
+		foreach(array("characters","skills","aspects","stunts") as $table) {
+			$temp = "query_".$table;
+			$query = "SELECT * FROM $table WHERE name='$name'";
+			// If it's aspects or stunts, make sure it's ordered by the number.
+			if ( ($table == "aspects") || ($table == "stunts") ) { $query .= " ORDER BY num"; }
+			
+			// Run the query.
+			$$temp = $conn->query($query);
+			
+			// If it's characters or skills, turn it straight into an associative array.
+			if ( ($table == "characters") || ($table == "skills") ) { $$temp = $$temp->fetch_array(MYSQLI_ASSOC); }
+		}
 		
 		echo "<form action='fategen.php' method='post' id='save'>\n"; { //Character creation form
 		echo "<h2>$name (";
 		
+		// Save the character's type.
+		$type = $query_characters['type'];
+		
+		// selector for character type.
 		echo "<select name='type' size='1' id='typeselect'>\n";
 			foreach($types as $itype) {
 				echo "<option value='$itype'";
@@ -284,35 +298,32 @@
 		echo "</select>\n";
 		
 		echo ")</h2>\n";
-				
+		
+		// save the name as part of this form, too.
 		echo "<input type='hidden' name='name' value='$name'>\n";
 		echo "<table>\n<tr>\n";
 		
 		echo "<td id='aspects'>"; {//Aspects cell
-			$query = $conn->query("SELECT numaspects FROM characters WHERE name='$name'");
-			$result = $query->fetch_array(MYSQLI_ASSOC);
-			$query->close();
-			$numaspects = $result['numaspects'];
+			$numaspects= $query_characters['numaspects'];
 			
 			echo "<p><strong>Aspects</strong></p>\n";
 			
-			for ($a= 1; $a <= $numaspects; $a++) {
-				$query = $conn->query("SELECT aspect FROM aspects WHERE name='$name' and num='$a'");
-				$result = $query->fetch_array(MYSQLI_ASSOC);
-				$query->close();
-				$aspect = $result['aspect'];
-				echo "<div class='aspectdiv' id='aspectdiv.". ($a-1) ."'>";
+			for ($a= 0; $a < $numaspects; $a++) {
+				$query_aspects->data_seek($a);
+				$aspect = $query_aspects->fetch_array(MYSQLI_ASSOC)['aspect'];
+				echo "<div class='aspectdiv' id='aspectdiv.". ($a) ."'>";
 				
 				switch ($type) { // Provide special titles for some aspects.
 					case 'pc':
 					case 'npc': { //PCs and NPCs have the High Concept and Trouble headings.
-						if ($a == 1) echo "<strong>High Concept:</strong><br>\n"; 
-						if ($a == 2) echo "<strong>Trouble:</strong><br>\n";
-						if ($a == 3) echo "Other Aspects:<br>\n";
+						if ($a == 0) echo "<strong>High Concept:</strong><br>\n"; 
+						if ($a == 1) echo "<strong>Trouble:</strong><br>\n";
+						if ($a == 2) echo "Other Aspects:<br>\n";
 						break;
 					}
 					case 'corp': { //Megacorporations have the Slogan heading for the first aspect.
-						if ($a == 1) echo "<strong>Slogan:</strong><br>\n"; 
+						if ($a == 0) echo "<strong>Slogan:</strong><br>\n"; 
+						break;
 					}
 				}
 				echo "\t<textarea name='aspects[]' id='aspect.". ($a-1) ."' class='sheet.aspect' cols='48'>$aspect</textarea><br><br></div>\n";
@@ -322,13 +333,9 @@
 		
 		echo "<td id='skills'>"; { //Skills cell
 			echo "<p><strong>Skills</strong></p>\n";
-			$query = $conn->query("SELECT cap FROM characters WHERE name='$name'"); // Get the skill cap.
-			$result = $query->fetch_array(MYSQLI_ASSOC);
-			$query->close();
-			$cap = $result['cap'];
-			$query = $conn->query("SELECT * FROM skills WHERE name='$name'"); //Get all the character's skill ratings.
-			$pcskills = $query->fetch_array(MYSQLI_ASSOC);
-			$query->close();
+			
+			// Get the skill cap.
+			$cap = $query_characters['cap'];
 			
 			$skillspent= 0;
 			
@@ -336,14 +343,14 @@
 			echo "<div id='skillps'>";
 			
 			for ($i = $cap; $i > 0; $i--) { // For each rating from cap to Average...
-				$query = $conn->query("SELECT slots$i FROM characters WHERE name='$name'"); //...get the number of slots.
-				$result = $query->fetch_array(MYSQLI_ASSOC);
-				$query->close();
-				$slotsatrating = $result["slots$i"];
+				// ...get the number of slots.
+				$slotsatrating = $query_characters["slots$i"];
 				$skillspent += $slotsatrating * $i; // Add the cost to the 'skillsspent' attribute.
-				$skillsatrating_assoc = array_filter($pcskills,function($v) use($i) {return $v == $i;},0);
+				
+				// Filter out just the skills at that rating.
+				$skillsatrating_assoc = array_filter($query_skills,function($v) use($i) {return $v == $i;},0);
 				$skillsatrating = array();
-				foreach ($skillsatrating_assoc as $skill => $rating) { //Filter just the skills at that rating, into an INDEXED array.
+				foreach ($skillsatrating_assoc as $skill => $rating) { // Put them into a numerically-indexed array.
 					$skillsatrating[] = ucfirst($skill);
 				}
 				$numskillsatrating = count($skillsatrating);
@@ -374,15 +381,10 @@
 		
 		echo "<td id='stunts'>\n"; { //Stunts cell
 			echo "<p><strong>Stunts</strong></p>";
-			$query = $conn->query("SELECT freestunts FROM characters WHERE name='$name'");
-			$freestunts = $query->fetch_array(MYSQLI_ASSOC)['freestunts'];
-			$query->close();
-			
-			$stuntsquery = $conn->query("SELECT stunt,description FROM stunts WHERE name='$name'");
-			$numstunts = $stuntsquery->num_rows;
+			$numstunts = $query_stunts->num_rows;
 			
 			for ($i=0; $i < $numstunts; $i++) {
-				$stunt = $stuntsquery->fetch_array(MYSQLI_ASSOC);
+				$stunt = $query_stunts->fetch_array(MYSQLI_ASSOC);
 				
 				echo "\t<p id='stunt.$i' class='sheet.stunt'><input class='stuntname' type='text' size='48' maxlength='48' name='stunts[]' value='". htmlentities($stunt['stunt'],ENT_QUOTES) ."'><br>\n";
 				echo "\t\t<textarea name='stuntdescs[]' cols='50' rows='7'>". $stunt['description'] ."</textarea>";
@@ -401,10 +403,7 @@
 			
 			echo "<td class='bottom'>"; { //Skill points cell
 				echo "<p><em>Skill points:</em> ";
-				$query = $conn->query("SELECT skillpoints FROM characters WHERE name='$name'"); //Get the skill points.
-				$result = $query->fetch_array(MYSQLI_ASSOC);
-				$query->close();
-				$skillpoints = $result['skillpoints'];
+				$skillpoints = $query_characters['skillpoints'];
 				$skillleft = $skillpoints-$skillspent;
 				echo "<span id='skillleft'>$skillleft</span>";
 				echo "/<input type='number' name='skillpoints' min='0' id='sheet.skillpoints' value='$skillpoints'></p>\n";
@@ -416,14 +415,14 @@
 			}
 			
 			echo "<td class='bottom'>"; { // Refresh cell
+				$freestunts = $query_characters['freestunts'];
+				$refresh = $query_characters['refresh'];
+				$refreshleft = $refresh;
+			
 				echo "<p><em>Stunts:</em> ";
 				echo "<input type='number' name='numstunts' min='0' id='sheet.numstunts' value='". $numstunts ."'></p>\n";
 				echo "<p><em>Free stunts left:</em> <span id='freestuntsleft'>". max(0,$freestunts-$numstunts) ."</span>/";
 				echo "<input type='number' name='freestunts' min='0' value='$freestunts' id='sheet.freestunts'></p>\n";
-				$refreshquery = $conn->query("SELECT refresh FROM characters WHERE name='$name'");
-				$refresh = $refreshquery->fetch_array(MYSQLI_ASSOC)['refresh'];
-				$refreshquery->close();
-				$refreshleft = $refresh;
 				
 				if ($numstunts > $freestunts) {
 					//If you have more stunts than your free allowance...
@@ -440,6 +439,7 @@
 			}
 		}
 		echo "</tr></table>";
+		
 		echo "<input type='hidden' name='function' value='save'>";
 		echo "<input type='submit' value='Save'>\n";
 		echo "</form><br><br>\n";
