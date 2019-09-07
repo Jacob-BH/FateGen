@@ -1,14 +1,6 @@
 <head>
 	<title>Eye in the Sky: Aspect Shuffler</title>
 	<style>
-		body {font-family: Arial;}
-		
-		table, th, td {
-			border: 1px solid black;
-			border-collapse: collapse;
-			vertical-align: top;
-		}
-		
 		.title { width: 12em; }
 		.aspect { width: 64em; }
 		

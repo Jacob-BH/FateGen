@@ -1,14 +1,6 @@
 <head>
 	<title>Fate Character Creation Tool</title>
 	<style>
-		body { font-family: Arial; }
-		
-		table, th, td {
-			border: 1px solid black;
-			border-collapse: collapse;
-			vertical-align: top;
-		}
-		
 		input[type='number'] {width: 3em;}
 		
 		.stuntname, .pc {font-weight: bold;}
@@ -36,7 +28,9 @@
 			padding-left: 0.5em;
 		}
 		
-		.hidden { display:none; }
+		.hidden {
+			display:none;
+		}
 	</style>
 </head>
 

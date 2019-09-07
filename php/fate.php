@@ -1,15 +1,6 @@
 <head>
 	<title>Eye in the Sky</title>
 	<style>
-		body {
-			font-family: Arial;
-		}
-		
-		table, th, td {
-			border: 1px solid black;
-			border-collapse: collapse;
-		}
-		
 		.pc {
 			border: 1px solid black;
 			margin-bottom: 1em;
