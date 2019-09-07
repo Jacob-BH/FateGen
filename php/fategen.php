@@ -438,7 +438,35 @@
 				echo "</td>\n";
 			}
 		}
-		echo "</tr></table>";
+		
+		
+		echo "</tr></table>\n";
+		
+		// A paragraph showing the skills not yet selected.
+		echo "<p id='unused_skills_p'>" . adjective(0) . " skills: <span id='unused_skills'>\n";
+		
+		// Filter them out from the skills array.
+		$skillsatrating_assoc = array_filter($query_skills,function($v,$k) {
+			// Is this just the spot dedicated to character name?
+			if ($k == 'name') { return false; }
+			// Otherwise, check whether the rating is equal to zero.
+			else { return $v == 0; }
+		},ARRAY_FILTER_USE_BOTH);
+		
+		// Initialise the iteration counter.
+		$i = 0;
+		
+		foreach($skillsatrating_assoc as $skill => $rating) {
+			if ($i > 0) { echo ", "; }
+			echo "<span class='unused_skill'>$skill</span>";
+			
+			$i++;
+		}
+		
+		// We don't need $i anymore. Unset it.
+		unset($i);
+		
+		echo "</span></p>\n";
 		
 		echo "<input type='hidden' name='function' value='save'>";
 		echo "<input type='submit' value='Save'>\n";
