@@ -37,13 +37,19 @@ function adjective (rating) {
 		case -2:
 			return "Terrible (-2)";
 			break;
+		case -3:
+			return "Catastrophic (-3)";
+			break;
+		case -4:
+			return "Horrifying (-4)";
+			break;
 	}
 	
 	if (rating > 8) {
-		return `Legendary+${rating-8} (+${rating})`;
+		return `Beyond Legendary (+${rating})`;
 	}
 	else if (rating < -2) {
-		return `Terrible${rating+2} (${rating})`;
+		return `Beyond Horrifying (${rating})`;
 	}
 	else {
 		return `UNKNOWN ({$rating})`;

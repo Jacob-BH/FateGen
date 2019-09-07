@@ -42,13 +42,19 @@
 			case -2:
 				return "Terrible (-2)";
 				break;
+			case -3:
+				return "Catastrophic (-3)";
+				break;
+			case -4:
+				return "Horrifying (-4)";
+				break;
 		}
 		if ($rating > 8) {
-			return "Legendary+" . ($rating-8) . " (+" . $rating . ")";
+			return "Beyond Legendary (+$rating)";
 		}
 		
-		else if ($rating < -2) {
-			return "Terrible" . ($rating+2) . " (" . $rating . ")";
+		else if ($rating < -4) {
+			return "Beyond Horrifying ($rating)";
 		}
 		else {
 			return "UNKNOWN (" . $rating . ")";
@@ -68,7 +74,6 @@
 			$row = $result->fetch_array(MYSQLI_ASSOC);
 			${$type."s"}[] = $row['name'];
 		}
-		$result->close();
 	}
 	
 	function typeSwitch ($type) {
@@ -112,4 +117,13 @@
 		$string .= typeSwitch($type);
 		return $string;
 	}
+	
+	//Navigation Header
+	echo "\n<div id='nav'>\n";
+	foreach(array("fate","fateaspects","fategen") as $link) {
+		echo "<a href='$link.php'>$link</a>\n";
+	}
+	echo "\n</div>\n";
+	
+	echo "<style>@import 'fate.css';</style>\n\n";
 ?>
