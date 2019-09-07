@@ -457,7 +457,7 @@
 		$i = 0;
 		
 		foreach($skillsatrating_assoc as $skill => $rating) {
-			if ($i > 0) { echo ", "; }
+			if ($i > 0) { echo ","; }
 			echo "<span class='unused_skill'>$skill</span>";
 			
 			$i++;
