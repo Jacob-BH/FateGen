@@ -443,7 +443,7 @@
 		echo "</tr></table>\n";
 		
 		// A paragraph showing the skills not yet selected.
-		echo "<p id='unused_skills_p'>" . adjective(0) . " skills: <span id='unused_skills'>\n";
+		echo "<p id='unused_skills_p'>" . adjective(0) . " skills ";
 		
 		// Filter them out from the skills array.
 		$skillsatrating_assoc = array_filter($query_skills,function($v,$k) {
@@ -452,6 +452,11 @@
 			// Otherwise, check whether the rating is equal to zero.
 			else { return $v == 0; }
 		},ARRAY_FILTER_USE_BOTH);
+		
+		//Show the number
+		echo "(<span id='unused_num'>" . count($skillsatrating_assoc) . "</span>)";
+		
+		echo ": <span id='unused_skills'>\n";
 		
 		// Initialise the iteration counter.
 		$i = 0;

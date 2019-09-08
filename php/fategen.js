@@ -966,6 +966,9 @@ function updateUnused() {
 	});
 	
 	O('unused_skills').innerHTML= aSkills[0];
+	
+	// Update the NUMBER of unused, as well.
+	O('unused_num').innerHTML = aSkills[0].length;
 }
 
 //Javascript function to generate wikidot markup for the loaded character.
