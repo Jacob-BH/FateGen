@@ -115,8 +115,8 @@
 		}
 		
 		//Add them to the character table, with the posted type, number of aspects, skill cap, skill points, free stunts, and refresh value.
-		$stmt = $conn->prepare("INSERT INTO characters (name,type,numaspects,cap,skillpoints,freestunts,refresh) VALUES ('$name',?,?,?,?,?,?)");
-		$stmt->bind_param('siiiii',$type,$numaspects,$cap,$skillpoints,$freestunts,$refresh);
+		$stmt = $conn->prepare("INSERT INTO characters (name,type,numaspects,cap,skillpoints,freestunts,refresh,init_physical_bonus,init_social_bonus) VALUES ('$name',?,?,?,?,?,?,?,?)");
+		$stmt->bind_param('siiiiiii',$type,$numaspects,$cap,$skillpoints,$freestunts,$refresh,$init_physical_bonus,$init_social_bonus);
 		$stmt->execute();
 		
 		//Add them to the skills table. This fills them out with a default 0 in each skill.
@@ -410,6 +410,20 @@
 				
 				echo "<p><em>Skill cap:</em> "; //skill cap.
 				echo "<input type='number' name='cap' min='1' max='8' id='sheet.cap' value='$cap'></p>\n";
+				
+				//Inputs for physical and social initiative boosts.
+				foreach(array("physical","social") as $conflict) {
+					$column= "init_$conflict"."_bonus";
+					
+					$bonus = $query_characters[$column];
+					
+					echo "<p>";
+					echo ucfirst($conflict);
+					echo " initiative bonus: ";
+					echo "<input type='number' name='$column' min='0' value='$bonus'>";
+					
+					echo "</p>\n";
+				}
 				
 				echo "</td>\n";
 			}
