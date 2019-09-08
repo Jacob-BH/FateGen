@@ -59,8 +59,6 @@ function adjective (rating) {
 //Array of all skill names.
 const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','empathy','fight','investigate','lore','notice','physique','provoke','rapport','resources','shoot','stealth','will'];
 
-//Only load the below chargen-handling JS if PHP has loaded the chargen table.
-//if (O('save') != null) {
 	//Get the number of aspects.
 	let numAspects = O('sheet.numaspects').value;
 
@@ -119,6 +117,14 @@ const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','
 			let sel = oSkills[i][j];
 			let skill = sel.value;
 			aSkills[i].push(skill);
+		}
+		
+		//Grab the initial unused skills from the chargen table.
+		//Initialise the unused-skills array.
+		aSkills[0]= [];
+		let unused= C('unused_skill');
+		for (let i=0; i<unused.length; i++) {
+			aSkills[0].push(unused[i].innerHTML);
 		}
 	}
 
@@ -215,6 +221,7 @@ const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','
 		
 		//Check for repeat skills.
 		checkForRepeatSkills();
+		updateUnused();
 	}
 
 	//Add the onchange for all slots.
@@ -289,8 +296,9 @@ const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','
 		
 		aSkills[ind1][ind2] = this.value;
 		
-		//Check whether the change has caused or removed repeats.
+		//Check whether the change has caused or removed repeats, or unused skills.
 		checkForRepeatSkills();
+		updateUnused();
 	}
 	//Add the onchange for all skills.
 	for (let i=1; i< oSkills.length; i++) {
@@ -547,6 +555,7 @@ const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','
 		
 		//Check whether the re-added skills result in repeats.
 		checkForRepeatSkills();
+		updateUnused();
 	}
 	O('sheet.cap').onchange = capChange;
 
@@ -848,7 +857,6 @@ const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','
 			O('skillleft').innerHTML = skillLeft;
 		}
 	}
-//}
 
 //
 // Responses for changing the visibility of inputs in the combined function form.
@@ -933,6 +941,31 @@ function skillLookup (skill) {
 	});
 	// If we go through the whole array without finding it, return 0.
 	return rating;
+}
+
+//Function to update the 'unused skills' paragraph as needed.
+function updateUnused() {
+	//Checks the current layout of aSkills to update aSkills[0] and thence the unused skills paragraph.
+	
+	//Make an array of all skills that HAVE been used, up to the current cap and slot numbers.
+	let used=[];
+	for (let i=1; i<=cap; i++) {
+		for (let j=0; j<aSlots[i]; j++) {
+			//Grab the skill.
+			let skill= aSkills[i][j];
+			//Make sure it's an actual skill, not a placeholder.
+			if (skill != '_') {
+				used.push(skill);
+			}
+		}
+	}
+	
+	//Filter the list of all skill names, to find those that have NOT been used, and place them into aSkills[0].
+	aSkills[0]= skillNames.filter(function(skill) {
+		return used.indexOf(skill) == -1;
+	});
+	
+	O('unused_skills').innerHTML= aSkills[0];
 }
 
 //Javascript function to generate wikidot markup for the loaded character.
