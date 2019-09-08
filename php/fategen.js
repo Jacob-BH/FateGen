@@ -59,6 +59,73 @@ function adjective (rating) {
 //Array of all skill names.
 const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','empathy','fight','investigate','lore','notice','physique','provoke','rapport','resources','shoot','stealth','will'];
 
+//
+// Responses for changing the visibility of inputs in the combined function form.
+//
+
+// First, save the current function as 'func'.
+let func= O('functionselect').value;
+
+function functionChange(e) {
+	//Save the 'before' and 'after' functions.
+	before = func;
+	after = this.value;
+	
+	//Only proceed if there is a difference.
+	if (before != after) {
+		//Initialise a 'mustHide' and 'mustShow' array, which will be populated depending on the particular value.
+		let mustShow=[];
+		let mustHide=[];
+		
+		//Switch based on the value, and which inputs that value needs.
+		let func= this.value;
+		
+		switch(func) {
+			//Load, Backup, and Delete will all need just the name dropdown.
+			case 'load':
+			case 'backup':
+			case 'delete': {
+				mustShow.push('input_name');
+				mustHide.push('input_newname');
+				mustHide.push('input_type');
+				break;
+			}
+			//Create will need the newname and type, but not the name dropdown.
+			case 'create': {
+				mustShow.push('input_newname');
+				mustShow.push('input_type');
+				mustHide.push('input_name');
+				break;
+			}
+			//Rename will need the name dropdown and newname input, but not the type.
+			case 'rename': {
+				mustShow.push('input_name');
+				mustShow.push('input_newname');
+				mustHide.push('input_type');
+			}
+		}
+		
+		//Now that the arrays have been populated, use them to add or remove the 'hidden' class as needed.
+		
+		mustShow.forEach(function(item) {
+			//Remove the hidden class, if it has it.
+			let obj= O(item);
+			if (obj.classList.contains("hidden")) {obj.classList.remove("hidden");}
+		});
+		
+		mustHide.forEach(function(item) {
+			//Add the hidden class, if it doesn't have it.
+			let obj= O(item);
+			if (!obj.classList.contains("hidden")) {obj.classList.add("hidden");}
+		});
+		
+		func = after;
+	}
+}
+O('functionselect').onchange= functionChange;
+
+
+
 	//Get the number of aspects.
 	let numAspects = O('sheet.numaspects').value;
 
@@ -857,71 +924,6 @@ const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','
 			O('skillleft').innerHTML = skillLeft;
 		}
 	}
-
-//
-// Responses for changing the visibility of inputs in the combined function form.
-//
-
-// First, save the current function as 'func'.
-let func= O('functionselect').value;
-
-function functionChange(e) {
-	//Save the 'before' and 'after' functions.
-	before = func;
-	after = this.value;
-	
-	//Only proceed if there is a difference.
-	if (before != after) {
-		//Initialise a 'mustHide' and 'mustShow' array, which will be populated depending on the particular value.
-		let mustShow=[];
-		let mustHide=[];
-		
-		//Switch based on the value, and which inputs that value needs.
-		let func= this.value;
-		
-		switch(func) {
-			//Load, Backup, and Delete will all need just the name dropdown.
-			case 'load':
-			case 'backup':
-			case 'delete': {
-				mustShow.push('input_name');
-				mustHide.push('input_newname');
-				mustHide.push('input_type');
-				break;
-			}
-			//Create will need the newname and type, but not the name dropdown.
-			case 'create': {
-				mustShow.push('input_newname');
-				mustShow.push('input_type');
-				mustHide.push('input_name');
-				break;
-			}
-			//Rename will need the name dropdown and newname input, but not the type.
-			case 'rename': {
-				mustShow.push('input_name');
-				mustShow.push('input_newname');
-				mustHide.push('input_type');
-			}
-		}
-		
-		//Now that the arrays have been populated, use them to add or remove the 'hidden' class as needed.
-		
-		mustShow.forEach(function(item) {
-			//Remove the hidden class, if it has it.
-			let obj= O(item);
-			if (obj.classList.contains("hidden")) {obj.classList.remove("hidden");}
-		});
-		
-		mustHide.forEach(function(item) {
-			//Add the hidden class, if it doesn't have it.
-			let obj= O(item);
-			if (!obj.classList.contains("hidden")) {obj.classList.add("hidden");}
-		});
-		
-		func = after;
-	}
-}
-O('functionselect').onchange= functionChange;
 
 //Credit for these two functions goes to O'Reilly, from the book "Learning PHP, MySQL & JavaScript, 5th Edition"
 //O(), given ID or object, returns the object.
