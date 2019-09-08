@@ -59,6 +59,9 @@ function adjective (rating) {
 //Array of all skill names.
 const skillNames=['athletics','burglary','contacts','crafts','deceive','drive','empathy','fight','investigate','lore','notice','physique','provoke','rapport','resources','shoot','stealth','will'];
 
+//String for the innerHTML of new skill dropdowns.
+const options=`<option value="_">_</option>\n<option value="athletics">athletics</option>\n<option value="burglary">burglary</option>\n<option value="contacts">contacts</option>\n<option value="crafts">crafts</option>\n<option value="deceive">deceive</option>\n<option value="drive">drive</option>\n<option value="empathy">empathy</option>\n<option value="fight">fight</option>\n<option value="investigate">investigate</option>\n<option value="lore">lore</option>\n<option value="notice">notice</option>\n<option value="physique">physique</option>\n<option value="provoke">provoke</option>\n<option value="rapport">rapport</option>\n<option value="resources">resources</option>\n<option value="shoot">shoot</option>\n<option value="stealth">stealth</option>\n<option value="will">will</option>`;
+
 //
 // Responses for changing the visibility of inputs in the combined function form.
 //
@@ -124,52 +127,63 @@ function functionChange(e) {
 }
 O('functionselect').onchange= functionChange;
 
+// Declare the variables which will be filled in within the big if(), so you can use them outside it.
+let numAspects;
+let skillPoints;
+let skillLeft;
+let cap;
+let numStunts;
+let freeStunts;
+let refresh;
+let skillRatings;
+let oAspects; let aAspects;
+let oSlots; let aSlots; let oSkills; let aSkills;
+let oStunts; let aStuntNames; let aStuntDescs;
 
-
+//Load this if the character sheet is not null.
+if (O('save') != null) {
 	//Get the number of aspects.
-	let numAspects = O('sheet.numaspects').value;
+	numAspects = O('sheet.numaspects').value;
 
 	//Get the skill points.
-	let skillPoints = O('sheet.skillpoints').value;
+	skillPoints = O('sheet.skillpoints').value;
 
 	//Get the skill points left.
-	let skillLeft = O('skillleft').innerHTML;
+	skillLeft = O('skillleft').innerHTML;
 
 	//Get the skill cap.
-	let cap = O('sheet.cap').value;
+	cap = O('sheet.cap').value;
 
 	//Get the number of stunts.
-	let numStunts = O('sheet.numstunts').value;
+	numStunts = O('sheet.numstunts').value;
 
 	//Get the number of FREE stunts.
-	let freeStunts = O('sheet.freestunts').value;
+	freeStunts = O('sheet.freestunts').value;
 
 	//Get the refresh.
-	let refresh= O('sheet.refresh').value;
-
-	//String for the innerHTML of new skill dropdowns.
-	const options=`<option value="_">_</option>\n<option value="athletics">athletics</option>\n<option value="burglary">burglary</option>\n<option value="contacts">contacts</option>\n<option value="crafts">crafts</option>\n<option value="deceive">deceive</option>\n<option value="drive">drive</option>\n<option value="empathy">empathy</option>\n<option value="fight">fight</option>\n<option value="investigate">investigate</option>\n<option value="lore">lore</option>\n<option value="notice">notice</option>\n<option value="physique">physique</option>\n<option value="provoke">provoke</option>\n<option value="rapport">rapport</option>\n<option value="resources">resources</option>\n<option value="shoot">shoot</option>\n<option value="stealth">stealth</option>\n<option value="will">will</option>`;
+	refresh= O('sheet.refresh').value;
 
 	//Initialise the 'skillRatings' object; for each skill, it will save an array of the dropdown ids which are set to that skill.
-	let skillRatings={};
+	skillRatings={};
 	skillNames.forEach(function(item) {
 		skillRatings[item]= [];
 	});
 
 	//Get the aspect textareas, in both their HTML object form and an array of their text.
-	let oAspects = C('sheet.aspect');
-	let aAspects = [];
+	oAspects = C('sheet.aspect');
+	aAspects = [];
 	for (let i=0; i < oAspects.length; i++) {
 		aAspects[i] = oAspects[i].innerHTML;
 	}
 
 	//Get the skills.
 	//First, the slots.
-	let oSlots = [];
-	let aSlots = [];
+	oSlots = [];
+	aSlots = [];
 
-	let oSkills = [];
-	let aSkills = [];
+	oSkills = [];
+	//let aSkills = [];
+	aSkills = [];
 	for (let i=cap; i>0; i--) {
 		//Populate oSlots and aSlots manually via cap, because positioning within the array is meaningful.
 		oSlots[i] = O('slots.'+i);
@@ -196,9 +210,9 @@ O('functionselect').onchange= functionChange;
 	}
 
 	//Get the stunts, in both their object form and arrays of their names and descs.
-	let oStunts = C('sheet.stunt');
-	let aStuntNames = [];
-	let aStuntDescs = [];
+	oStunts = C('sheet.stunt');
+	aStuntNames = [];
+	aStuntDescs = [];
 	for (let i=0; i<oStunts.length; i++) {
 		aStuntNames[i] = oStunts[i].children[0].value;
 		aStuntDescs[i] = oStunts[i].children[2].innerHTML;
@@ -925,6 +939,35 @@ O('functionselect').onchange= functionChange;
 		}
 	}
 
+	//Function to update the 'unused skills' paragraph as needed.
+	function updateUnused() {
+		//Checks the current layout of aSkills to update aSkills[0] and thence the unused skills paragraph.
+		
+		//Make an array of all skills that HAVE been used, up to the current cap and slot numbers.
+		let used=[];
+		for (let i=1; i<=cap; i++) {
+			for (let j=0; j<aSlots[i]; j++) {
+				//Grab the skill.
+				let skill= aSkills[i][j];
+				//Make sure it's an actual skill, not a placeholder.
+				if (skill != '_') {
+					used.push(skill);
+				}
+			}
+		}
+		
+		//Filter the list of all skill names, to find those that have NOT been used, and place them into aSkills[0].
+		aSkills[0]= skillNames.filter(function(skill) {
+			return used.indexOf(skill) == -1;
+		});
+		
+		O('unused_skills').innerHTML= aSkills[0];
+		
+		// Update the NUMBER of unused, as well.
+		O('unused_num').innerHTML = aSkills[0].length;
+	}
+}
+
 //Credit for these two functions goes to O'Reilly, from the book "Learning PHP, MySQL & JavaScript, 5th Edition"
 //O(), given ID or object, returns the object.
 //C(), given class, returns the HTML collection of all objects with that class.
@@ -943,34 +986,6 @@ function skillLookup (skill) {
 	});
 	// If we go through the whole array without finding it, return 0.
 	return rating;
-}
-
-//Function to update the 'unused skills' paragraph as needed.
-function updateUnused() {
-	//Checks the current layout of aSkills to update aSkills[0] and thence the unused skills paragraph.
-	
-	//Make an array of all skills that HAVE been used, up to the current cap and slot numbers.
-	let used=[];
-	for (let i=1; i<=cap; i++) {
-		for (let j=0; j<aSlots[i]; j++) {
-			//Grab the skill.
-			let skill= aSkills[i][j];
-			//Make sure it's an actual skill, not a placeholder.
-			if (skill != '_') {
-				used.push(skill);
-			}
-		}
-	}
-	
-	//Filter the list of all skill names, to find those that have NOT been used, and place them into aSkills[0].
-	aSkills[0]= skillNames.filter(function(skill) {
-		return used.indexOf(skill) == -1;
-	});
-	
-	O('unused_skills').innerHTML= aSkills[0];
-	
-	// Update the NUMBER of unused, as well.
-	O('unused_num').innerHTML = aSkills[0].length;
 }
 
 //Javascript function to generate wikidot markup for the loaded character.
