@@ -405,8 +405,9 @@
 				echo "<p><em>Skill points:</em> ";
 				$skillpoints = $query_characters['skillpoints'];
 				$skillleft = $skillpoints-$skillspent;
-				echo "<span id='skillleft'>$skillleft</span>";
-				echo "/<input type='number' name='skillpoints' min='0' id='sheet.skillpoints' value='$skillpoints'></p>\n";
+				echo "<span id='skillleft'>$skillleft</span>\n";
+				echo "/<input type='number' name='skillpoints' min='0' id='sheet.skillpoints' value='$skillpoints'>\n";
+				echo " (<span id='skillspent'>$skillspent</span> spent)</p>\n";
 				
 				echo "<p><em>Skill cap:</em> "; //skill cap.
 				echo "<input type='number' name='cap' min='1' max='8' id='sheet.cap' value='$cap'></p>\n";

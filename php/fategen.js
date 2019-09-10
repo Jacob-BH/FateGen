@@ -127,14 +127,9 @@ function functionChange(e) {
 }
 O('functionselect').onchange= functionChange;
 
-// Declare the variables which will be filled in within the big if(), so you can use them outside it.
-let numAspects;
-let skillPoints;
-let skillLeft;
-let cap;
-let numStunts;
-let freeStunts;
-let refresh;
+// Declare character sheet variables into global scope so they can still be used in the console.
+let numAspects; let skillPoints; let skillLeft; let cap;
+let numStunts; let freeStunts; let refresh;
 let skillRatings;
 let oAspects; let aAspects;
 let oSlots; let aSlots; let oSkills; let aSkills;
@@ -279,30 +274,10 @@ if (O('save') != null) {
 		}
 		aSlots[i]= this.value;
 		
-		//Update the 'skill points left' reference.
-		let oldSkillLeft= O('skillleft').innerHTML;
-		
-		//Initialise 'skill points left' to the total skill points.
-		let newSkillLeft = O('sheet.skillpoints').value;
-		
-		//Loop through the aSlots array...
-		for (let r=1; r<aSlots.length; r++) {
-			//Number of slots at that rating.
-			let number = aSlots[r];
-			
-			//Subtract that number multiplied by the rating cost.
-			newSkillLeft -= (number * r);
-		}
-		
-		//Update the span.
-		O('skillleft').innerHTML= newSkillLeft;
-		
-		//Update the varaible.
-		skillLeft= newSkillLeft;
-		
-		//Check for repeat skills.
+		//Check for repeat skills and run the update functions.
 		checkForRepeatSkills();
 		updateUnused();
+		updateSP();
 	}
 
 	//Add the onchange for all slots.
@@ -474,15 +449,8 @@ if (O('save') != null) {
 		let oldNum = parseInt(skillPoints);
 		let newNum = parseInt(O('sheet.skillpoints').value);
 		
-		//Find the difference.
-		let diff = newNum - oldNum;
-		
-		//Add the different to skillLeft to update the span.
-		let total= parseInt(skillLeft) + diff;
-		O('skillleft').innerHTML = total;
-		
-		skillLeft= total;
 		skillPoints= newNum;
+		updateSP();
 	}
 	O('sheet.skillpoints').onchange = skillPointsChange;
 
@@ -501,18 +469,13 @@ if (O('save') != null) {
 			for (let i=oldNum; i>newNum; i--) {
 				// Find how many slots used to be here.
 				let hadSkills = aSlots[i];
-				// Add the savings to skillsSaved.
-				skillsSaved += hadSkills * i;
 				
 				//Find the target object. ID is format skills.RATING, e.g. skills.4
 				let target = O(`skills.${i}`);
 				skillDiv.removeChild(target);
 			}
-			//Also update the skills spent
-			let total = parseInt(skillLeft) + skillsSaved;
-			O('skillleft').innerHTML= total.toString();
 			
-			skillLeft= total;
+			updateSP();
 		}
 		
 		if (newNum > oldNum) {
@@ -583,60 +546,20 @@ if (O('save') != null) {
 					for (let j=0; j<numSlots; j++) {
 						
 						makeNewSkill(newSpan,i,j);
-						
-						/*
-						//If it's a multiple of 3 (or it's 0), add a br
-						if ((j%3)==0) {
-							newP.append( document.createElement('br') );
-						}
-						//Otherwise, just a space.
-						else {
-							newP.append(" ");
-						}
-						
-						//Create the slot.
-						newSkill = document.createElement('select');
-						newSkill.id= `skills.${i}.${j}`;
-						newSkill.name= `skills${i}[]`;
-						newSkill.classList.add(`sheet.skillselect`);
-						newSkill.classList.add(`sheet.skillselect.${i}`);
-						newSkill.size= 1;
-						newSkill.innerHTML= options;
-						newSkill.onchange= skillsChange;
-						
-						//Has this skill existed on the page (and in the array) before?
-						if (aSkills[i][j] != undefined) {
-							//If yes, remember the old selection.
-							newSkill.value = aSkills[i][j];
-						}
-						else {
-							//If no, fill it in with the placeholder (and add that to the array)
-							newSkill.value = "_";
-							aSkills[i][j]= "_";
-						}
-						
-						//Append it.
-						newP.append(newSkill);
-						*/
 					}
 				}
 				//Add the new paragraph to the top.
 				skillDiv.prepend(newP);
 			}
-			
-			//Also update the skills spent
-			let total = parseInt(skillLeft) - skillCost;
-			O('skillleft').innerHTML= total.toString();
-			
-			skillLeft= total;
 		}
 		
 		//Update the cap.
 		cap = newNum;
 		
-		//Check whether the re-added skills result in repeats.
+		//Check for repeats and run the update functions.
 		checkForRepeatSkills();
 		updateUnused();
+		updateSP();
 	}
 	O('sheet.cap').onchange = capChange;
 
@@ -932,10 +855,8 @@ if (O('save') != null) {
 				makeNewSkill(origin,fromRating,i);
 			}
 			
-			//Adjust skill points left.
-			skillLeft += fromRating;
-			skillLeft -= toRating;
-			O('skillleft').innerHTML = skillLeft;
+			//Update the skill points.
+			updateSP();
 		}
 	}
 
@@ -965,6 +886,22 @@ if (O('save') != null) {
 		
 		// Update the NUMBER of unused, as well.
 		O('unused_num').innerHTML = aSkills[0].length;
+	}
+	
+	// Function to update the 'skillleft' and 'skillspent' spans, to be called after skillpoints and aSlots have been updated.
+	function updateSP() {
+		let skillSpent= 0;
+		
+		//Loop from 1 to the skill cap, to find the current number of slots. (Cannot simply .reduce() the aSlots array because it remembers ratings which have been nixed by lowering the skill cap.)
+		for (let i=1; i<= cap; i++) {
+			skillSpent += aSlots[i] * i;
+		}
+		
+		//Update the skillspent span.
+		O('skillspent').innerHTML = skillSpent;
+		
+		//Update the skillleft span.
+		O('skillleft').innerHTML = skillPoints - skillSpent;
 	}
 }
 
