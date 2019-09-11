@@ -418,9 +418,9 @@
 					
 					$bonus = $query_characters[$column];
 					
-					echo "<p>";
+					echo "<p><em>";
 					echo ucfirst($conflict);
-					echo " initiative bonus: ";
+					echo " initiative bonus:</em> ";
 					echo "<input type='number' name='$column' min='0' value='$bonus'>";
 					
 					echo "</p>\n";
