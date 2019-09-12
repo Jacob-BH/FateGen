@@ -120,10 +120,14 @@
 	
 	//Navigation Header
 	echo "\n<div id='nav'>\n";
-	foreach(array("fate","fateaspects","fategen") as $link) {
+	foreach(array("fate","fateaspects","fategen","fatesheets","fateinit") as $link) {
 		echo "<a href='$link.php'>$link</a>\n";
 	}
 	echo "\n</div>\n";
 	
+	// Import the external style sheet.
 	echo "<style>@import 'fate.css';</style>\n\n";
+	
+	// Import the external javascript.
+	echo "<script type='text/javascript' src='fate.js'></script>\n\n";
 ?>
