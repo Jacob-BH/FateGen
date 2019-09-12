@@ -33,7 +33,7 @@
 					
 					switch ($row['num']) { //If it's aspect 1 or 2, give it the special title.
 						case 1:
-							echo "<strong>High Aspect:</strong> ";
+							echo "<strong>High Concept:</strong> ";
 							break;
 						case 2:
 							echo "<strong>Trouble:</strong> ";
