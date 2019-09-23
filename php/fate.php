@@ -161,7 +161,7 @@
 				break;
 			case 'physical':
 			default:
-				$hierarchy= array('notice','athletics','fight','shoot','will');
+				$hierarchy= array('notice','athletics','combat','physique','will');
 				break;
 		}
 		$query = "SELECT name,"; { // Build query

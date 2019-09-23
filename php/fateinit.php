@@ -16,11 +16,11 @@ foreach ( array('physical','social') as $init) { //Initiative for each conflict 
 	//Populate the skill hierarchy. This determines turn order, with tiebreakers farther down the hierarchy.
 	switch ($init) {
 		case 'social':
-			$hierarchy = array('empathy','deceive','rapport','provoke','will');
+			$hierarchy = array('empathy','deceive','rapport','will');
 			break;
 		case 'physical':
 		default:
-			$hierarchy = array('notice','athletics','fight','shoot','will');
+			$hierarchy = array('notice','athletics','combat','will');
 			break;
 	}
 	
