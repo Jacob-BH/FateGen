@@ -948,7 +948,9 @@ function wikify( doneThisBefore = false) {
 		}
 		
 		//If this *is* an NPC, close out the collapsible.
+		else {
 		string += `[[/collapsible]]\n`;
+		}
 		
 		//Add line breaks.
 		string += "\n\n";
