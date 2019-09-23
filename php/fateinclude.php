@@ -4,7 +4,8 @@
 	$conn = new mysqli($hn, $un, $pw, "Fate");
 	
 	//Create an array of all the skill names.
-	$skills = array('athletics','burglary','contacts','crafts','deceive','drive','empathy','fight','investigate','lore','notice','physique','provoke','rapport','resources','shoot','stealth','will');
+	//$skills = array('athletics', 'burglary', 'contacts', 'crafts', 'deceive', 'drive', 'empathy', 'fight', 'investigate', 'lore', 'notice', 'physique', 'provoke', 'rapport', 'resources', 'shoot', 'stealth', 'will');
+	$skills = array('athletics', 'burglary', 'combat', 'contacts', 'crafts', 'deceive', 'drive', 'empathy', 'investigate', 'lore', 'notice', 'physique', 'provoke', 'rapport', 'resources', 'stealth', 'will');
 	
 	//Given a number, returns the correct Fate Core ladder adjective.
 	function adjective ( $rating ) {
