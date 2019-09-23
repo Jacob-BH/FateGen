@@ -25,7 +25,7 @@ foreach ( array('physical','social') as $init) { //Initiative for each conflict 
 	}
 	
 	//Build the query.
-	$query = "SELECT name, type, ";
+	$query = "SELECT name, type, refresh, physique, ";
 	
 	$limit = count($hierarchy); 
 	
@@ -93,15 +93,57 @@ foreach ( array('physical','social') as $init) { //Initiative for each conflict 
 		echo "\t\t<tr class='${row['type']}'><td class='name_${row['type']}'>${row['name']}</td>\n";
 		
 		//Grab just the skill totals.
-		$row = array_slice($row,2,NULL,TRUE);
+		$row = array_slice($row,4,NULL,TRUE);
 		foreach($row as $skill => $rating) {
 			echo "\t\t\t<td>" . adjective($rating) . "</td>\n";
 		}
-		echo "\t\t</tr>";
+		echo "\t\t</tr>\n";
 	}
 	
-	echo "\t</table><br>";
-	//echo "<p>$query</p>";
+	echo "\t</table><br>\n";
+	
+	//Table good for copy-pasting into the Conflict Sheet.
+	echo "\t<table>\n";
+	
+	echo "\t<tr><th colspan='3'>" . strtoupper($init) . "</td></tr>";
+	
+	echo "\t\t<th>Character</th>\n\t\t<th>FP</th>\n\t\t<th>Stress</th>\n";
+	
+	for ($i=0; $i<$rows; $i++) {
+		$init_order->data_seek($i);
+		$row = $init_order->fetch_array(MYSQLI_ASSOC);
+		$type = $row['type'];
+		
+		echo "\t\t<tr class='$type'>\n\t\t\t<td class='name_$type'>${row['name']}</td>\n";
+		if ($type == 'pc') { $fp = $row['refresh']; }
+		else { $fp = ""; }
+		
+		echo "\t\t\t<td>$fp</td>\n";
+		
+		switch ($init) {
+			case 'social': {
+				$stressskill = 'will';
+				break;
+			}
+			default: {
+				$stressskill = 'physique';
+				break;
+			}
+		}
+		
+		$stressrating = $row[$stressskill];
+		if ($stressrating < 1) { $stressboxes = 2; }
+		elseif ($stressrating < 3) {$stressboxes = 3; }
+		else {$stressboxes = 4;}
+		
+		echo "\t\t\t<td>";
+		echo str_repeat("O",$stressboxes);		
+		echo "</td>\n";
+		
+		echo "\t\t</tr>\n";
+	}
+	
+	echo "\t</table>\n";
 }
 
 //Include the NPC selector, to add NPCs to the initiative list.
