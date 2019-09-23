@@ -6,7 +6,11 @@
 	<style>
 		.name_pc { font-weight: bold; }
 		
-		.npc { background: cyan; }
+		.npc { background: lightcoral; }
+		
+		table {width: 50%; }
+		
+		
 	</style>
 </head>
 <?php
