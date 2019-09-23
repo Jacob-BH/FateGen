@@ -17,16 +17,18 @@
 	</style>
 </head>
 <?php
+	include 'fate_npcselector.php';
+	
 	echo "<p><span id='showhideall'>Show/Hide all</span></p>\n\n";
 	
 	foreach ($pcs as $name) {
 		charDisplay($name,$conn);
 	}
 	
-	include 'fate_npcselector.php';
-	
 	if (isset($_POST['getnpcs'])) {
 		$getnpcs = $_POST['getnpcs'];
+		
+		echo "<h1>NPCs</h1>\n";
 		foreach($getnpcs as $name) {
 			charDisplay($name,$conn);
 		}
