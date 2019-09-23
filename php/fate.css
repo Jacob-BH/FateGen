@@ -11,3 +11,22 @@ table, th, td {
 #nav {
 	background: #DDD;
 }
+
+
+.npc_selector select {
+    display:table;
+	width: 110em;
+}
+
+.npc_selector optgroup {
+	display:table-row;
+}
+
+.npc_selector option {
+    display:table-cell;
+	border: 1px solid black;
+	border-collapse: collapse;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	width: 10em;
+}
