@@ -1,5 +1,10 @@
 //String for the innerHTML of new skill dropdowns.
-const options=`<option value="_">_</option>\n<option value="athletics">athletics</option>\n<option value="burglary">burglary</option>\n<option value="combat">combat</option>\n<option value="contacts">contacts</option>\n<option value="crafts">crafts</option>\n<option value="deceive">deceive</option>\n<option value="drive">drive</option>\n<option value="empathy">empathy</option>\n<option value="investigate">investigate</option>\n<option value="lore">lore</option>\n<option value="notice">notice</option>\n<option value="physique">physique</option>\n<option value="provoke">provoke</option>\n<option value="rapport">rapport</option>\n<option value="resources">resources</option>\n<option value="stealth">stealth</option>\n<option value="will">will</option>`;
+let options="<option value='_'>_</option>\n";
+skillNames.forEach(function(skill) {
+	options += `<option value='${skill}'>${skill}</option>\n`;
+});
+
+//const options=`<option value="_">_</option>\n<option value="athletics">athletics</option>\n<option value="burglary">burglary</option>\n<option value="combat">combat</option>\n<option value="contacts">contacts</option>\n<option value="crafts">crafts</option>\n<option value="deceive">deceive</option>\n<option value="drive">drive</option>\n<option value="empathy">empathy</option>\n<option value="investigate">investigate</option>\n<option value="lore">lore</option>\n<option value="notice">notice</option>\n<option value="physique">physique</option>\n<option value="provoke">provoke</option>\n<option value="rapport">rapport</option>\n<option value="resources">resources</option>\n<option value="stealth">stealth</option>\n<option value="will">will</option>`;
 
 //
 // Responses for changing the visibility of inputs in the combined function form.
