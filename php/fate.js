@@ -61,7 +61,3 @@ function adjective (rating) {
 		return `UNKNOWN ({$rating})`;
 	}
 }
-
-//Array of all skill names.
-//const skillNames=['athletics', 'burglary', 'contacts', 'crafts', 'deceive', 'drive', 'empathy', 'fight', 'investigate', 'lore', 'notice', 'physique', 'provoke', 'rapport', 'resources', 'shoot', 'stealth', 'will'];
-const skillNames=['athletics', 'burglary', 'combat', 'contacts', 'crafts', 'deceive', 'drive', 'empathy', 'investigate', 'lore', 'notice', 'physique', 'provoke', 'rapport', 'resources', 'stealth', 'will'];

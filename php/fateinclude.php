@@ -4,9 +4,25 @@
 	$conn = new mysqli($hn, $un, $pw, "Fate");
 	
 	//Create an array of all the skill names.
-	//$skills = array('athletics', 'burglary', 'contacts', 'crafts', 'deceive', 'drive', 'empathy', 'fight', 'investigate', 'lore', 'notice', 'physique', 'provoke', 'rapport', 'resources', 'shoot', 'stealth', 'will');
-	$skills = array('athletics', 'burglary', 'combat', 'contacts', 'crafts', 'deceive', 'drive', 'empathy', 'investigate', 'lore', 'notice', 'physique', 'provoke', 'rapport', 'resources', 'stealth', 'will');
+	$skills = array();
+	$skilldesc = $conn->query("DESCRIBE skills");
+	//Start at index 1 to skip the character name column.
+	for ($i = 1; $i < $skilldesc->num_rows; $i++) {
+		$skilldesc->data_seek($i);
+		$row = $skilldesc->fetch_array(MYSQLI_NUM);
+		$skills[] = $row[0];
+	}
+	$skilldesc->close();
 	
+	//Do the same for JavaScript.
+?>
+
+<script>
+	let skillNames= <?php echo json_encode($skills); ?>;
+</script>
+	
+	
+<?php
 	//Given a number, returns the correct Fate Core ladder adjective.
 	function adjective ( $rating ) {
 		switch ($rating) {
