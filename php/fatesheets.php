@@ -82,6 +82,11 @@
 		//Skills section
 		echo "\t\t<td class='skills'>\n"; {
 			$cap = $query_characters['cap'];
+			$skillpoints = $query_characters['skillpoints'];
+			
+			// Initialise the skill cost.
+			$skillcost = 0;
+			
 			
 			// Loop from the cap down to 1.
 			for ($i = $cap; $i >= 1; $i--) {
@@ -91,6 +96,9 @@
 				
 				//Get the number of slots at that rating.
 				$numslots = $query_characters["slots$i"];
+				
+				//Add their cost to the cost total.
+				$skillcost += $i * $numslots;
 				
 				//Filter the array to find just those skills that are at this rating.
 				$skillsatrating = array_filter($query_skills, function($v) use ($i) {
@@ -140,7 +148,12 @@
 			}
 			echo count($skillsatrating) . "): ";
 			echo itemise($skillsatrating);
-			echo "</p>\n\t\t</td>\n\n";
+			echo "</p>\n";
+			
+			//Show the skill points.
+			echo "\t\t\t<p>Skill points: " . ($skillpoints-$skillcost) . "/" . $skillpoints . "</p>";
+			
+			echo "\t\t</td>\n\n";
 		}
 		
 		//Stunts section
